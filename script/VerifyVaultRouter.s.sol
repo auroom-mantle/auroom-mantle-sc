@@ -36,13 +36,13 @@ contract VerifyVaultRouter is Script {
         console.log("Total Supply:", vault.totalSupply());
         console.log("Identity Registry:", address(vault.identityRegistry()));
         console.log("Uniswap Router:", address(vault.uniswapRouter()));
-        console.log("USDC:", address(vault.usdc()));
+        console.log("USDC:", vault.usdcToken());
 
         // Verify constructor parameters
         require(vault.asset() == XAUT, "XAUT mismatch");
         require(address(vault.identityRegistry()) == IDENTITY_REGISTRY, "IdentityRegistry mismatch");
         require(address(vault.uniswapRouter()) == UNISWAP_ROUTER, "UniswapRouter mismatch");
-        require(address(vault.usdc()) == USDC, "USDC mismatch");
+        require(vault.usdcToken() == USDC, "USDC mismatch");
 
         console.log("\n[OK] GoldVault verification passed!");
 
