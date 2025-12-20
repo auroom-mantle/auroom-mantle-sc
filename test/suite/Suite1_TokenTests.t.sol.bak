@@ -1,0 +1,459 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.30;
+
+import "forge-std/Test.sol";
+import "forge-std/console.sol";
+
+// Import deployed contracts
+import {MockIDRX} from "../../src/MockIDRX.sol";
+import {MockUSDC} from "../../src/MockUSDC.sol";
+import {XAUT} from "../../src/XAUT.sol";
+import {IdentityRegistry} from "../../src/IdentityRegistry.sol";
+import {GoldVault} from "../../src/GoldVault.sol";
+import {SwapRouter} from "../../src/SwapRouter.sol";
+import {IUniswapV2Factory} from "../../src/interfaces/IUniswapV2Factory.sol";
+import {IUniswapV2Pair} from "../../src/interfaces/IUniswapV2Pair.sol";
+import {IUniswapV2Router02} from "../../src/interfaces/IUniswapV2Router02.sol";
+
+/**
+ * @title Suite1_TokenTests
+ * @notice Test Suite 1: Token Tests - MockIDRX, MockUSDC, XAUT
+ * @dev Tests interact with deployed contracts on Mantle Sepolia testnet
+ * @dev Covers: Basic token functionality, ERC20 compliance, Identity-based compliance (XAUT)
+ */
+contract Suite1_TokenTests is Test {
+    // ========================================
+    // DEPLOYED CONTRACT ADDRESSES
+    // ========================================
+
+    // Tokens
+    address constant MOCK_IDRX = 0x6EC7D79792D4D73eb711d36aB5b5f24014f18d05;
+    address constant MOCK_USDC = 0x96ABff3a2668B811371d7d763f06B3832CEdf38d;
+    address constant XAUT_TOKEN = 0x1d6f37f76E2AB1cf9A242a34082eDEc163503A78;
+
+    // Infrastructure
+    address constant IDENTITY_REGISTRY = 0x620870d419F6aFca8AFed5B516619aa50900cadc;
+    address constant UNISWAP_FACTORY = 0x8950d0D71a23085C514350df2682c3f6F1D7aBFE;
+    address constant UNISWAP_ROUTER = 0xF01D09A6CF3938d59326126174bD1b32FB47d8F5;
+
+    // Pairs
+    address constant IDRX_USDC_PAIR = 0xD3FF8e1C2821745513Ef83f3551668A7ce791Fe2;
+    address constant XAUT_USDC_PAIR = 0xc2da5178F53f45f604A275a3934979944eB15602;
+
+    // Core Protocol
+    address constant GOLD_VAULT = 0xa039F4E162F8A8C5d01C57b78daDa8dcc976657a;
+    address constant SWAP_ROUTER = 0x2737e491775055F7218b40A11DE10dA855968277;
+
+    // Network Configuration
+    uint256 constant MANTLE_SEPOLIA_CHAIN_ID = 5003;
+    string constant MANTLE_SEPOLIA_RPC = "https://rpc.sepolia.mantle.xyz";
+    address constant DEPLOYER = 0x742812a2Ff08b76f968dffA7ca6892A428cAeBb1;
+
+    // ========================================
+    // CONTRACT INSTANCES
+    // ========================================
+
+    MockIDRX public idrx;
+    MockUSDC public usdc;
+    XAUT public xautToken;
+    IdentityRegistry public identityRegistry;
+    IUniswapV2Factory public factory;
+    IUniswapV2Router02 public router;
+    IUniswapV2Pair public idrxUsdcPair;
+    IUniswapV2Pair public xautUsdcPair;
+    GoldVault public goldVault;
+    SwapRouter public swapRouter;
+
+    // ========================================
+    // TEST ACCOUNTS
+    // ========================================
+
+    address public deployer = DEPLOYER;
+    address public alice;
+    address public bob;
+    address public charlie;
+
+    // ========================================
+    // SETUP
+    // ========================================
+
+    function setUp() public {
+        // Fork Mantle Sepolia
+        vm.createSelectFork(MANTLE_SEPOLIA_RPC);
+
+        // Verify we're on correct chain
+        require(block.chainid == MANTLE_SEPOLIA_CHAIN_ID, "Wrong chain ID");
+
+        // Initialize contract instances
+        idrx = MockIDRX(MOCK_IDRX);
+        usdc = MockUSDC(MOCK_USDC);
+        xautToken = XAUT(XAUT_TOKEN);
+        identityRegistry = IdentityRegistry(IDENTITY_REGISTRY);
+        factory = IUniswapV2Factory(UNISWAP_FACTORY);
+        router = IUniswapV2Router02(UNISWAP_ROUTER);
+        idrxUsdcPair = IUniswapV2Pair(IDRX_USDC_PAIR);
+        xautUsdcPair = IUniswapV2Pair(XAUT_USDC_PAIR);
+        goldVault = GoldVault(GOLD_VAULT);
+        swapRouter = SwapRouter(SWAP_ROUTER);
+
+        // Create test accounts
+        alice = makeAddr("alice");
+        bob = makeAddr("bob");
+        charlie = makeAddr("charlie");
+
+        // Fund test accounts with MNT (native token)
+        vm.deal(alice, 100 ether);
+        vm.deal(bob, 100 ether);
+        vm.deal(charlie, 100 ether);
+
+        console.log("=== AuRoom Integration Test Setup ===");
+        console.log("Chain ID:", block.chainid);
+        console.log("Block Number:", block.number);
+        console.log("Deployer:", deployer);
+        console.log("Alice:", alice);
+        console.log("Bob:", bob);
+        console.log("Charlie:", charlie);
+    }
+
+    // ========================================
+    // SUITE 1: TOKEN TESTS
+    // ========================================
+
+    function test_MockIDRX_Metadata() public view {
+        assertEq(idrx.name(), "Mock IDRX", "Incorrect token name");
+        assertEq(idrx.symbol(), "IDRX", "Incorrect token symbol");
+        assertEq(idrx.decimals(), 6, "Incorrect decimals");
+
+        console.log("MockIDRX Name:", idrx.name());
+        console.log("MockIDRX Symbol:", idrx.symbol());
+        console.log("MockIDRX Decimals:", idrx.decimals());
+    }
+
+    function test_MockIDRX_PublicMint() public {
+        uint256 mintAmount = 1000 * 10**6; // 1000 IDRX
+
+        vm.startPrank(alice);
+
+        uint256 balanceBefore = idrx.balanceOf(alice);
+
+        vm.expectEmit(true, false, false, true);
+        emit MockIDRX.Mint(alice, mintAmount);
+        idrx.publicMint(alice, mintAmount);
+
+        uint256 balanceAfter = idrx.balanceOf(alice);
+
+        assertEq(balanceAfter - balanceBefore, mintAmount, "Mint amount mismatch");
+
+        console.log("Alice IDRX balance before:", balanceBefore);
+        console.log("Alice IDRX balance after:", balanceAfter);
+        console.log("Minted amount:", mintAmount);
+
+        vm.stopPrank();
+    }
+
+    function test_MockIDRX_OwnerMint() public {
+        uint256 mintAmount = 5000 * 10**6; // 5000 IDRX
+
+        vm.startPrank(deployer);
+
+        uint256 balanceBefore = idrx.balanceOf(bob);
+
+        vm.expectEmit(true, false, false, true);
+        emit MockIDRX.Mint(bob, mintAmount);
+        idrx.mint(bob, mintAmount);
+
+        uint256 balanceAfter = idrx.balanceOf(bob);
+
+        assertEq(balanceAfter - balanceBefore, mintAmount, "Mint amount mismatch");
+
+        console.log("Bob IDRX balance before:", balanceBefore);
+        console.log("Bob IDRX balance after:", balanceAfter);
+
+        vm.stopPrank();
+    }
+
+    function test_MockIDRX_Transfer() public {
+        uint256 mintAmount = 1000 * 10**6; // 1000 IDRX
+        uint256 transferAmount = 300 * 10**6; // 300 IDRX
+
+        // Mint to Alice
+        vm.prank(alice);
+        idrx.publicMint(alice, mintAmount);
+
+        // Transfer from Alice to Bob
+        vm.startPrank(alice);
+
+        uint256 aliceBalanceBefore = idrx.balanceOf(alice);
+        uint256 bobBalanceBefore = idrx.balanceOf(bob);
+
+        idrx.transfer(bob, transferAmount);
+
+        uint256 aliceBalanceAfter = idrx.balanceOf(alice);
+        uint256 bobBalanceAfter = idrx.balanceOf(bob);
+
+        assertEq(aliceBalanceBefore - aliceBalanceAfter, transferAmount, "Alice balance decrease mismatch");
+        assertEq(bobBalanceAfter - bobBalanceBefore, transferAmount, "Bob balance increase mismatch");
+
+        console.log("Transfer amount:", transferAmount);
+        console.log("Alice balance after transfer:", aliceBalanceAfter);
+        console.log("Bob balance after transfer:", bobBalanceAfter);
+
+        vm.stopPrank();
+    }
+
+    function test_MockUSDC_Metadata() public view {
+        assertEq(usdc.name(), "Mock USDC", "Incorrect token name");
+        assertEq(usdc.symbol(), "USDC", "Incorrect token symbol");
+        assertEq(usdc.decimals(), 6, "Incorrect decimals");
+
+        console.log("MockUSDC Name:", usdc.name());
+        console.log("MockUSDC Symbol:", usdc.symbol());
+        console.log("MockUSDC Decimals:", usdc.decimals());
+    }
+
+    function test_MockUSDC_PublicMint() public {
+        uint256 mintAmount = 2000 * 10**6; // 2000 USDC
+
+        vm.startPrank(alice);
+
+        uint256 balanceBefore = usdc.balanceOf(alice);
+
+        vm.expectEmit(true, false, false, true);
+        emit MockUSDC.Mint(alice, mintAmount);
+        usdc.publicMint(alice, mintAmount);
+
+        uint256 balanceAfter = usdc.balanceOf(alice);
+
+        assertEq(balanceAfter - balanceBefore, mintAmount, "Mint amount mismatch");
+
+        console.log("Alice USDC balance before:", balanceBefore);
+        console.log("Alice USDC balance after:", balanceAfter);
+        console.log("Minted amount:", mintAmount);
+
+        vm.stopPrank();
+    }
+
+    function test_MockUSDC_OwnerMint() public {
+        uint256 mintAmount = 10000 * 10**6; // 10000 USDC
+
+        vm.startPrank(deployer);
+
+        uint256 balanceBefore = usdc.balanceOf(charlie);
+
+        vm.expectEmit(true, false, false, true);
+        emit MockUSDC.Mint(charlie, mintAmount);
+        usdc.mint(charlie, mintAmount);
+
+        uint256 balanceAfter = usdc.balanceOf(charlie);
+
+        assertEq(balanceAfter - balanceBefore, mintAmount, "Mint amount mismatch");
+
+        console.log("Charlie USDC balance before:", balanceBefore);
+        console.log("Charlie USDC balance after:", balanceAfter);
+
+        vm.stopPrank();
+    }
+
+    function test_MockUSDC_Transfer() public {
+        uint256 mintAmount = 2000 * 10**6; // 2000 USDC
+        uint256 transferAmount = 500 * 10**6; // 500 USDC
+
+        // Mint to Alice
+        vm.prank(alice);
+        usdc.publicMint(alice, mintAmount);
+
+        // Transfer from Alice to Charlie
+        vm.startPrank(alice);
+
+        uint256 aliceBalanceBefore = usdc.balanceOf(alice);
+        uint256 charlieBalanceBefore = usdc.balanceOf(charlie);
+
+        usdc.transfer(charlie, transferAmount);
+
+        uint256 aliceBalanceAfter = usdc.balanceOf(alice);
+        uint256 charlieBalanceAfter = usdc.balanceOf(charlie);
+
+        assertEq(aliceBalanceBefore - aliceBalanceAfter, transferAmount, "Alice balance decrease mismatch");
+        assertEq(charlieBalanceAfter - charlieBalanceBefore, transferAmount, "Charlie balance increase mismatch");
+
+        console.log("Transfer amount:", transferAmount);
+        console.log("Alice balance after transfer:", aliceBalanceAfter);
+        console.log("Charlie balance after transfer:", charlieBalanceAfter);
+
+        vm.stopPrank();
+    }
+
+    // ========================================
+    // SUITE 1.3: XAUT TOKEN TESTS (Compliant Token)
+    // ========================================
+
+    function test_XAUT_Metadata() public view {
+        assertEq(xautToken.name(), "Mock Tether Gold", "Incorrect token name");
+        assertEq(xautToken.symbol(), "XAUT", "Incorrect token symbol");
+        assertEq(xautToken.decimals(), 6, "Incorrect decimals");
+
+        console.log("XAUT Name:", xautToken.name());
+        console.log("XAUT Symbol:", xautToken.symbol());
+        console.log("XAUT Decimals:", xautToken.decimals());
+    }
+
+    function test_XAUT_HasIdentityRegistry() public view {
+        address registryAddress = address(xautToken.identityRegistry());
+        assertEq(registryAddress, IDENTITY_REGISTRY, "Incorrect identity registry address");
+        assertTrue(registryAddress != address(0), "Identity registry should not be zero address");
+
+        console.log("XAUT Identity Registry:", registryAddress);
+        console.log("Expected Registry:", IDENTITY_REGISTRY);
+    }
+
+    function test_XAUT_MintToVerifiedAddress() public {
+        uint256 mintAmount = 100 * 10**6; // 100 XAUT (100 oz gold)
+
+        // First, verify Alice in the identity registry
+        vm.prank(deployer);
+        identityRegistry.registerIdentity(alice);
+
+        // Verify Alice is registered
+        assertTrue(identityRegistry.isVerified(alice), "Alice should be verified");
+
+        // Now mint XAUT to Alice
+        vm.startPrank(deployer);
+
+        uint256 balanceBefore = xautToken.balanceOf(alice);
+        xautToken.mint(alice, mintAmount);
+        uint256 balanceAfter = xautToken.balanceOf(alice);
+
+        assertEq(balanceAfter - balanceBefore, mintAmount, "Mint amount mismatch");
+
+        console.log("Alice verified:", identityRegistry.isVerified(alice));
+        console.log("Alice XAUT balance before:", balanceBefore);
+        console.log("Alice XAUT balance after:", balanceAfter);
+        console.log("Minted amount:", mintAmount);
+
+        vm.stopPrank();
+    }
+
+    function test_XAUT_RevertMintToUnverifiedAddress() public {
+        uint256 mintAmount = 100 * 10**6; // 100 XAUT
+
+        // Ensure Bob is NOT verified
+        assertFalse(identityRegistry.isVerified(bob), "Bob should not be verified");
+
+        // Try to mint to unverified Bob - should revert
+        vm.startPrank(deployer);
+
+        vm.expectRevert("XAUT: recipient not verified");
+        xautToken.mint(bob, mintAmount);
+
+        console.log("Bob verified:", identityRegistry.isVerified(bob));
+        console.log("Mint to unverified address correctly reverted");
+
+        vm.stopPrank();
+    }
+
+    function test_XAUT_TransferBetweenVerifiedAddresses() public {
+        uint256 mintAmount = 200 * 10**6; // 200 XAUT
+        uint256 transferAmount = 50 * 10**6; // 50 XAUT
+
+        // Verify both Alice and Bob
+        vm.startPrank(deployer);
+        identityRegistry.registerIdentity(alice);
+        identityRegistry.registerIdentity(bob);
+        vm.stopPrank();
+
+        // Verify both are registered
+        assertTrue(identityRegistry.isVerified(alice), "Alice should be verified");
+        assertTrue(identityRegistry.isVerified(bob), "Bob should be verified");
+
+        // Mint XAUT to Alice
+        vm.prank(deployer);
+        xautToken.mint(alice, mintAmount);
+
+        // Transfer from Alice to Bob
+        vm.startPrank(alice);
+
+        uint256 aliceBalanceBefore = xautToken.balanceOf(alice);
+        uint256 bobBalanceBefore = xautToken.balanceOf(bob);
+
+        xautToken.transfer(bob, transferAmount);
+
+        uint256 aliceBalanceAfter = xautToken.balanceOf(alice);
+        uint256 bobBalanceAfter = xautToken.balanceOf(bob);
+
+        assertEq(aliceBalanceBefore - aliceBalanceAfter, transferAmount, "Alice balance decrease mismatch");
+        assertEq(bobBalanceAfter - bobBalanceBefore, transferAmount, "Bob balance increase mismatch");
+
+        console.log("Alice verified:", identityRegistry.isVerified(alice));
+        console.log("Bob verified:", identityRegistry.isVerified(bob));
+        console.log("Transfer amount:", transferAmount);
+        console.log("Alice balance after:", aliceBalanceAfter);
+        console.log("Bob balance after:", bobBalanceAfter);
+
+        vm.stopPrank();
+    }
+
+    function test_XAUT_RevertTransferToUnverifiedAddress() public {
+        uint256 mintAmount = 200 * 10**6; // 200 XAUT
+        uint256 transferAmount = 50 * 10**6; // 50 XAUT
+
+        // Verify only Alice (sender)
+        vm.prank(deployer);
+        identityRegistry.registerIdentity(alice);
+
+        // Ensure Charlie is NOT verified
+        assertFalse(identityRegistry.isVerified(charlie), "Charlie should not be verified");
+
+        // Mint XAUT to Alice
+        vm.prank(deployer);
+        xautToken.mint(alice, mintAmount);
+
+        // Try to transfer from Alice to unverified Charlie - should revert
+        vm.startPrank(alice);
+
+        vm.expectRevert("XAUT: recipient not verified");
+        xautToken.transfer(charlie, transferAmount);
+
+        console.log("Alice verified:", identityRegistry.isVerified(alice));
+        console.log("Charlie verified:", identityRegistry.isVerified(charlie));
+        console.log("Transfer to unverified address correctly reverted");
+
+        vm.stopPrank();
+    }
+
+    function test_XAUT_RevertTransferFromUnverifiedAddress() public {
+        uint256 mintAmount = 200 * 10**6; // 200 XAUT
+        uint256 transferAmount = 50 * 10**6; // 50 XAUT
+
+        // Verify only Bob (recipient)
+        vm.prank(deployer);
+        identityRegistry.registerIdentity(bob);
+
+        // Ensure Alice is NOT verified
+        assertFalse(identityRegistry.isVerified(alice), "Alice should not be verified");
+
+        // Note: We can't mint to unverified Alice, so this test demonstrates
+        // that even if an unverified address somehow had tokens, they couldn't transfer
+
+        // For this test, we'll verify Alice temporarily, mint, then remove verification
+        vm.startPrank(deployer);
+        identityRegistry.registerIdentity(alice);
+        xautToken.mint(alice, mintAmount);
+        identityRegistry.removeIdentity(alice);
+        vm.stopPrank();
+
+        // Verify Alice is now unverified
+        assertFalse(identityRegistry.isVerified(alice), "Alice should be unverified");
+
+        // Try to transfer from unverified Alice - should revert
+        vm.startPrank(alice);
+
+        vm.expectRevert("XAUT: sender not verified");
+        xautToken.transfer(bob, transferAmount);
+
+        console.log("Alice verified:", identityRegistry.isVerified(alice));
+        console.log("Bob verified:", identityRegistry.isVerified(bob));
+        console.log("Transfer from unverified address correctly reverted");
+
+        vm.stopPrank();
+    }
+}

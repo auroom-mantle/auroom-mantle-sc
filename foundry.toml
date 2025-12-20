@@ -43,11 +43,6 @@ test = "test"
 gas_reports = ["*"]
 fuzz = { runs = 256 }
 
-# Formatting
-line_length = 120
-tab_width = 4
-bracket_spacing = true
-int_types = "long"
 
 # RPC endpoints
 [rpc_endpoints]
