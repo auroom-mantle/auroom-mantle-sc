@@ -1,0 +1,24 @@
+{
+    "mantleSepolia": {
+        "chainId": 5003,
+        "name": "Mantle Sepolia",
+        "tokens": {
+            "MockIDRX": "0x6EC7D79792D4D73eb711d36aB5b5f24014f18d05",
+            "MockUSDC": "0x96ABff3a2668B811371d7d763f06B3832CEdf38d",
+            "XAUT": "0x1d6f37f76E2AB1cf9A242a34082eDEc163503A78"
+        },
+        "infrastructure": {
+            "IdentityRegistry": "0x620870d419F6aFca8AFed5B516619aa50900cadc",
+            "UniswapV2Factory": "0x8950d0D71a23085C514350df2682c3f6F1D7aBFE",
+            "UniswapV2Router02": "0x54166b2C5e09f16c3c1D705FfB4eb29a069000A9"
+        },
+        "pairs": {
+            "IDRX_USDC": "0xD3FF8e1C2821745513Ef83f3551668A7ce791Fe2",
+            "XAUT_USDC": "0xc2da5178F53f45f604A275a3934979944eB15602"
+        },
+        "protocol": {
+            "SwapRouter": "0xF948Dd812E7fA072367848ec3D198cc61488b1b9",
+            "GoldVault": "0xd92cE2F13509840B1203D35218227559E64fbED0"
+        }
+    }
+}
