@@ -412,7 +412,7 @@ Project Link: [https://github.com/YohanesVito/auroom-sc](https://github.com/Yoha
 
 <div align="center">
 
-**Built with ❤️ for Mantle Global Hackathon 2025**
+**Built with ❤️ for Lisk Builders Challenge: Round Three**
 
 [⬆ Back to Top](#-auroom-protocol---smart-contracts)
 
