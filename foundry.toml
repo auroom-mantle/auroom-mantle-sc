@@ -46,12 +46,21 @@ fuzz = { runs = 256 }
 
 # RPC endpoints
 [rpc_endpoints]
+# Mantle Networks
+mantle_sepolia = "${MANTLE_SEPOLIA_RPC}"
+mantle_mainnet = "${MANTLE_MAINNET_RPC}"
+# Base Networks (legacy)
 base_sepolia = "${BASE_SEPOLIA_RPC}"
 base_mainnet = "${BASE_MAINNET_RPC}"
+# Local
 localhost = "http://localhost:8545"
 
-# Etherscan verification
+# Etherscan/Blockscout verification
 [etherscan]
+# Mantle uses Blockscout
+mantle_sepolia = { key = "${MANTLE_API_KEY}", url = "https://explorer.sepolia.mantle.xyz/api" }
+mantle_mainnet = { key = "${MANTLE_API_KEY}", url = "https://explorer.mantle.xyz/api" }
+# Base (legacy)
 base_sepolia = { key = "${BASESCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api" }
 base_mainnet = { key = "${BASESCAN_API_KEY}", url = "https://api.basescan.org/api" }
 

@@ -8,11 +8,11 @@
 
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.30-363636?style=flat-square&logo=solidity)](https://docs.soliditylang.org/)
 [![Foundry](https://img.shields.io/badge/Foundry-1.5.0-orange?style=flat-square)](https://getfoundry.sh/)
-[![Base](https://img.shields.io/badge/Base-Sepolia-blue?style=flat-square)](https://base.org/)
+[![Mantle](https://img.shields.io/badge/Mantle-Sepolia-green?style=flat-square)](https://mantle.xyz/)
 [![Tests](https://img.shields.io/badge/Tests-106%2F106%20Passing-brightgreen?style=flat-square)](./test)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](./LICENSE)
 
-[Live Demo](https://auroom-testnet.vercel.app) • [Frontend Repo](https://github.com/AuRoom-Base/auroom-base-fe) • [Backend Repo](https://github.com/AuRoom-Base/auroom-base-be) • [Documentation](#-documentation)
+[Live Demo](https://auroom-mantle-testnet.vercel.app) • [Frontend Repo](https://github.com/auroom-mantle/auroom-mantle-fe) • [Backend Repo](https://github.com/auroom-mantle/auroom-mantle-be) • [Documentation](#-documentation)
 
 </div>
 
@@ -24,23 +24,21 @@
 
 ### The Problem
 
-| Traditional Gold Investment | Regular DEX |
-|----------------------------|-------------|
-| ❌ High minimum investment | ❌ Swap only, no yield |
-| ❌ Storage fees | ❌ Assets sit idle |
-| ❌ Illiquid (limited hours) | ❌ Manual management |
-| ❌ No yield generation | ❌ Just tokens, no system |
+| Gold Liquidity Trap in Indonesia | The Cost |
+|-------------------------------------|-------------|
+| Sell gold instantly | 8–12% loss due to bid-ask spreads |
+| Use pawnshops | Slow, bureaucratic process |
+| Hold and wait | Miss critical emergency cash needs |
 
----
+### The Solution: AuRoom
 
-## ✨ Key Features
-
-- 🔄 **Seamless Swap**: IDRX → USDC → XAUT in one transaction
-- 💰 **Cash Loan**: Borrow IDRX (Indonesian Rupiah) using XAUT (gold) as collateral
-- 🏦 **Fiat Redemption**: Convert IDRX to IDR (Indonesian fiat) via integrated IDRX.org API
-- 🪪 **KYC Compliance**: On-chain identity verification (ERC-3643 inspired)
-- ⚡ **Low Fees**: Built on Base L2 for minimal gas costs (0.5% borrow fee)
-- 🔒 **Security**: Slippage protection, LTV limits, access control
+| AuRoom Feature | Benefit |
+|-------------------|-----------|
+| Intent-Based Emergency Flow | Enter IDR needed, gold buffer calculated automatically |
+| Partial Liquidity Access | Unlock only what you need, keep the rest |
+| Direct Gold-to-Bank Settlement | Cash sent straight to your bank account |
+| Emergency-First UX | No crypto jargon, designed for speed |
+| On-Chain Security | Transparent smart contracts + bank API integration |
 
 ---
 
@@ -64,7 +62,7 @@
      │ SwapRouter │ │ Borrowing    │ │ IDRX    │
      │            │ │ ProtocolV2   │ │ Burn +  │
      └─────┬──────┘ └──────────────┘ │ API     │
-           │                          └─────────┘
+           │                         └─────────┘
            ▼
     ┌─────────────┐
     │ Uniswap V2  │
@@ -103,18 +101,18 @@ User deposits XAUT collateral
 
 ## 📜 Smart Contracts
 
-### Deployed Addresses (Base Sepolia)
+### Deployed Addresses (Mantle Sepolia)
 
 | Contract | Address | Description |
 |----------|---------|-------------|
-| **MockIDRX** | [`0x998ceb700e57f535873D189a6b1B7E2aA8C594EB`](https://sepolia.basescan.org/address/0x998ceb700e57f535873D189a6b1B7E2aA8C594EB) | Indonesian Rupiah Stablecoin (Mock) |
-| **MockUSDC** | [`0xCd88C2886A1958BA36238A070e71B51CF930b44d`](https://sepolia.basescan.org/address/0xCd88C2886A1958BA36238A070e71B51CF930b44d) | USD Coin (Mock) |
-| **XAUT** | [`0x56EeDF50c3C4B47Ca9762298B22Cb86468f834FC`](https://sepolia.basescan.org/address/0x56EeDF50c3C4B47Ca9762298B22Cb86468f834FC) | Tokenized Gold (Mock) |
-| **IdentityRegistry** | [`0xA8F2b8180caFC670f4a24114FDB9c50361038857`](https://sepolia.basescan.org/address/0xA8F2b8180caFC670f4a24114FDB9c50361038857) | KYC Verification |
-| **UniswapV2Factory** | [`0xDb198BEaccC55934062Be9AAEdce332c40A1f1Ed`](https://sepolia.basescan.org/address/0xDb198BEaccC55934062Be9AAEdce332c40A1f1Ed) | DEX Factory |
-| **UniswapV2Router** | [`0x620870d419F6aFca8AFed5B516619aa50900cadc`](https://sepolia.basescan.org/address/0x620870d419F6aFca8AFed5B516619aa50900cadc) | DEX Router |
-| **SwapRouter** | [`0x41c7215F0538200013F428732900bC581015c50e`](https://sepolia.basescan.org/address/0x41c7215F0538200013F428732900bC581015c50e) | IDRX↔XAUT Router |
-| **BorrowingProtocolV2** | [`0x3A1229F6D51940DBa65710F9F6ab0296FD56718B`](https://sepolia.basescan.org/address/0x3A1229F6D51940DBa65710F9F6ab0296FD56718B) | Cash Loan Protocol |
+| **MockIDRX** | [`0xf0C848387950609a3F97e3d67363C46562aD0e28`](https://explorer.sepolia.mantle.xyz/address/0xf0C848387950609a3F97e3d67363C46562aD0e28) | Indonesian Rupiah Stablecoin (Mock) |
+| **MockUSDC** | [`0xc76AfD7BAd35e66A6146564DDc391C97300c642b`](https://explorer.sepolia.mantle.xyz/address/0xc76AfD7BAd35e66A6146564DDc391C97300c642b) | USD Coin (Mock) |
+| **XAUT** | [`0xab8c0a0a773356A0843567b89E6e4330FDa7B9D6`](https://explorer.sepolia.mantle.xyz/address/0xab8c0a0a773356A0843567b89E6e4330FDa7B9D6) | Tokenized Gold (Mock) |
+| **IdentityRegistry** | [`0x28532929e2A67Dba781391bA0f7663b0cADA655F`](https://explorer.sepolia.mantle.xyz/address/0x28532929e2A67Dba781391bA0f7663b0cADA655F) | KYC Verification |
+| **UniswapV2Factory** | [`0x55c3D72C2F35A157ee154Bb37B7dDC9be0132BBf`](https://explorer.sepolia.mantle.xyz/address/0x55c3D72C2F35A157ee154Bb37B7dDC9be0132BBf) | DEX Factory |
+| **UniswapV2Router** | [`0x7064Acd14aD0a4b75997C0CcBAD2C89DadA6df69`](https://explorer.sepolia.mantle.xyz/address/0x7064Acd14aD0a4b75997C0CcBAD2C89DadA6df69) | DEX Router |
+| **SwapRouter** | [`0x8980c7477E091E06f34a418c9fc923D1df849734`](https://explorer.sepolia.mantle.xyz/address/0x8980c7477E091E06f34a418c9fc923D1df849734) | IDRX↔XAUT Router |
+| **BorrowingProtocolV2** | [`0xb38139e077621421eba724008bB33C10996E6435`](https://explorer.sepolia.mantle.xyz/address/0xb38139e077621421eba724008bB33C10996E6435) | Cash Loan Protocol |
 
 ### Contract Overview
 
@@ -233,8 +231,8 @@ Create a `.env` file:
 PRIVATE_KEY=your_private_key_here
 
 # RPC URLs
-BASE_SEPOLIA_RPC=https://sepolia.base.org
-BASE_MAINNET_RPC=https://mainnet.base.org
+MANTLE_SEPOLIA_RPC=https://rpc.sepolia.mantle.xyz
+MANTLE_MAINNET_RPC=https://rpc.mantle.xyz
 
 # Deployer address
 DEPLOYER=your_deployer_address
@@ -253,27 +251,23 @@ SWAP_ROUTER=
 TREASURY=your_treasury_address
 
 # Block explorer API key
-BASESCAN_API_KEY=your_api_key_here
+MANTLE_API_KEY=your_api_key_here
 ```
 
 ### Deployment
 
-See `script/base/deployment/README.md` for detailed deployment instructions.
+See `script/mantle/deployment/README.md` for detailed deployment instructions.
 
 ```bash
-# Deploy contracts to Base Sepolia (run in order)
-forge script script/base/deployment/Deploy01_MockIDRX.s.sol \
-  --rpc-url $BASE_SEPOLIA_RPC \
-  --broadcast \
-  --verify
+# Deploy contracts to Mantle Sepolia (run in order)
+forge script script/mantle/deployment/Deploy01_MockIDRX.s.sol \
+  --rpc-url $MANTLE_SEPOLIA_RPC \
+  --broadcast
 
 # ... continue with Deploy02 through Deploy09
 
-# Verify contracts on Basescan
-forge verify-contract <CONTRACT_ADDRESS> <CONTRACT_NAME> \
-  --chain-id 84532 \
-  --verifier blockscout \
-  --verifier-url https://base-sepolia.blockscout.com/api
+# Verify all contracts after deployment
+./script/mantle/post-deployment/verify-all.sh
 ```
 
 ### Post-Deployment Setup
@@ -282,18 +276,18 @@ Run the post-deployment scripts in order:
 
 ```bash
 # 1. Register contracts in KYC
-forge script script/base/post-deployment/Setup01_RegisterKYC.s.sol \
-  --rpc-url $BASE_SEPOLIA_RPC \
+forge script script/mantle/post-deployment/Setup01_RegisterKYC.s.sol \
+  --rpc-url $MANTLE_SEPOLIA_RPC \
   --broadcast
 
 # 2. Mint IDRX to Treasury
-forge script script/base/post-deployment/Setup02_MintTreasury.s.sol \
-  --rpc-url $BASE_SEPOLIA_RPC \
+forge script script/mantle/post-deployment/Setup02_MintTreasury.s.sol \
+  --rpc-url $MANTLE_SEPOLIA_RPC \
   --broadcast
 
 # 3. Approve Protocol to spend Treasury IDRX
-forge script script/base/post-deployment/Setup03_ApproveProtocol.s.sol \
-  --rpc-url $BASE_SEPOLIA_RPC \
+forge script script/mantle/post-deployment/Setup03_ApproveProtocol.s.sol \
+  --rpc-url $MANTLE_SEPOLIA_RPC \
   --broadcast
 ```
 
@@ -304,7 +298,7 @@ forge script script/base/post-deployment/Setup03_ApproveProtocol.s.sol \
 ```
 auroom-sc/
 ├── src/                    # Smart contract source files
-│   ├── GoldVault.sol
+│   ├── BorrowingProtocolV2.sol
 │   ├── SwapRouter.sol
 │   ├── IdentityRegistry.sol
 │   ├── XAUT.sol
@@ -312,13 +306,17 @@ auroom-sc/
 │   ├── MockUSDC.sol
 │   └── interfaces/
 ├── test/                   # Test files
-│   ├── GoldVault.t.sol
+│   ├── BorrowingProtocolV2.t.sol
 │   ├── SwapRouter.t.sol
 │   ├── IdentityRegistry.t.sol
 │   ├── Integration.t.sol
 │   └── ...
 ├── script/                 # Deployment scripts
-│   └── Deploy.s.sol
+│   ├── base/               # Base Sepolia (legacy)
+│   └── mantle/             # Mantle Sepolia (active)
+│       ├── deployment/
+│       ├── post-deployment/
+│       └── helper/
 ├── lib/                    # Dependencies (git submodules)
 │   ├── openzeppelin-contracts/
 │   ├── uniswap-v2-core/
@@ -383,7 +381,7 @@ Current status:
 
 - [x] Core contracts development
 - [x] Comprehensive test suite
-- [x] Lisk Sepolia deployment
+- [x] **Mantle Sepolia deployment** ✨
 - [x] BorrowingProtocolV2 (Cash Loan) implementation
 - [x] IDRX burn functions for redeem flow
 - [x] Frontend integration
@@ -415,7 +413,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Base Network** - L2 Infrastructure
+- **Mantle Network** - L2 Infrastructure
 - **IDRX.org** - Indonesian Rupiah Stablecoin & API Integration
 - **Tether Gold (XAUT)** - Tokenized gold concept
 - **OpenZeppelin** - Secure contract libraries
@@ -428,16 +426,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Apple Bites** - [@YohanesVito](https://github.com/YohanesVito)
 
 Project Links:
-- Smart Contracts: [https://github.com/YohanesVito/auroom-base-sc](https://github.com/YohanesVito/auroom-base-sc)
-- Frontend: [https://github.com/AuRoom-Base/auroom-base-fe](https://github.com/AuRoom-Base/auroom-base-fe)
-- Backend: [https://github.com/AuRoom-Base/auroom-base-be](https://github.com/AuRoom-Base/auroom-base-be)
+- Smart Contracts: [https://github.com/auroom-mantle/auroom-mantle-sc](https://github.com/auroom-mantle/auroom-mantle-sc)
+- Frontend: [https://github.com/auroom-mantle/auroom-mantle-fe](https://github.com/auroom-mantle/auroom-mantle-fe)
+- Backend: [https://github.com/auroom-mantle/auroom-mantle-be](https://github.com/auroom-mantle/auroom-mantle-be)
 
 ---
 
 <div align="center">
 
-**Built with ❤️ on Base Sepolia Network**
+**Built with ❤️ on Mantle Sepolia Network**
 
 [⬆ Back to Top](#-auroom-protocol---smart-contracts)
 
 </div>
+
